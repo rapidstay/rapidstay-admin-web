@@ -6,7 +6,7 @@
 const AUTH_BASE =
   location.hostname.includes("localhost") || location.hostname.includes("127.0.0.1")
     ? "http://localhost:8082"
-    : "https://rapidstay-api.onrender.com";
+    : "https://rapidstay-admin.onrender.com";
 
 const API_BASE = AUTH_BASE;
 
