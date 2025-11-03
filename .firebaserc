@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "rapidstay-admin-dev"
+  },
+  "targets": {
+    "rapidstay-c7f8e": {
+      "hosting": {
+        "rapidstay-admin": [
+          "rapidstay-admin"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

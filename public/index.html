@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RapidStay Admin Console</title>
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+<body>
+  <header>
+    <h1>🧭 RapidStay Admin Console</h1>
+    <p class="subtitle">도시 / 캐시 관리</p>
+  </header>
+
+  <main>
+    <!-- 도시 관리 -->
+    <section class="card">
+      <h2>도시 관리</h2>
+      <div class="row">
+        <input id="search" placeholder="도시명 검색 (예: 서울)" />
+        <button id="btnSearch">검색</button>
+        <button id="btnAll">전체보기</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>CityName</th><th>CityNameKr</th><th>Country</th>
+            <th>Lat</th><th>Lon</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="cityRows"></tbody>
+      </table>
+    </section>
+
+    <!-- 도시 상세 관리 -->
+    <div class="admin-section">
+      <h3>🏙️ 도시 생성 / 수정</h3>
+      <div class="admin-toolbox">
+        <input id="cityEn" placeholder="도시명(영문)" />
+        <input id="cityKr" placeholder="도시명(한글)" />
+        <input id="country" placeholder="국가" />
+        <input id="lat" placeholder="위도" />
+        <input id="lon" placeholder="경도" />
+      </div>
+      <div class="admin-btns">
+        <button id="btnAdd">등록</button>
+        <button id="btnUpdate">수정</button>
+        <button id="btnReset">폼 초기화</button>
+      </div>
+    </div>
+
+    <!-- 운영 도구 -->
+    <section class="card">
+      <h2>운영 도구</h2>
+      <div class="row">
+        <button id="btnFlush">Redis 캐시 초기화</button>
+        <button id="btnRebuild">city:list 재빌드</button>
+        <button id="btnBatch">CityDataCollector 실행</button>
+      </div>
+      <pre id="result"></pre>
+    </section>
+  </main>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>

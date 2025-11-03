@@ -1,0 +1,107 @@
+body {
+  font-family: 'Pretendard', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f6f8fa;
+  color: #222;
+}
+header {
+  background: #1f2937;
+  color: white;
+  padding: 16px 24px;
+}
+.subtitle { color: #9ca3af; }
+
+main {
+  padding: 24px;
+  max-width: 1200px;
+  margin: auto;
+}
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 16px 24px;
+  margin-bottom: 20px;
+}
+.row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+input, button { padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+button { cursor: pointer; background: #2563eb; color: white; border: none; }
+button:hover { background: #1e40af; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+th { background: #f1f5f9; }
+pre { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-size: 13px; overflow-x: auto; }
+
+/* ===============================
+   도시 생성 / 수정 섹션 (수정 반영)
+   =============================== */
+  .admin-section{
+    background:#fff;                 /* 기존 #f9fafb → 흰색으로 통일 */
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    padding:16px 24px;
+    margin:24px 0;                   /* 위아래 여백 추가 (붙는 현상 해소) */
+  }
+
+  #opsCard { margin-top:24px; } /* 운영도구 래퍼에 id 주면 깔끔 */
+
+/* 카드들이 연달아 올 때 간격 보장(보너스) */
+.card + .card { margin-top:24px; }
+
+.admin-section h3 {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 입력 필드들 grid로 정렬 */
+.admin-toolbox {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-toolbox input {
+  flex: 1;
+  min-width: 160px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+
+/* 버튼 영역 별도 정렬 */
+.admin-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.admin-btns button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-btns button:hover {
+  background: #1d4ed8;
+}
+
+#cityRows tr:hover {
+  background-color: #eef2ff; /* 부드러운 파란 하이라이트 */
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
