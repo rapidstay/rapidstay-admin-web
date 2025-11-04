@@ -6,7 +6,7 @@ import { getToken, clearToken } from "/js/auth.js";
 const API_BASE_URL =
   location.hostname.includes("localhost") || location.hostname.includes("127.0.0.1")
     ? "http://localhost:8081"
-    : "https://xap-h2xh.onrender.com"; // Render 배포 주소
+    : "https://rapidstay-api.onrender.com"; // Render 배포 주소
 
 export async function apiFetch(path, options = {}) {
   const token = getToken();
