@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>도시 마스터 관리 - RapidStay Admin</title>
+  <link rel="stylesheet" href="./css/admin.css" />
+
+  <!-- 로그인 보호 -->
+  <script type="module">
+    import { requireAuth } from "/js/auth.js";
+    requireAuth();
+  </script>
+
+    <style>
+  /* 다국어 탭 전용 */
+  .lang-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0 10px;
+  }
+  .lang-tab {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .lang-tab.active {
+    background: #1d4ed8;
+    color: #fff;
+    border-color: #1d4ed8;
+  }
+  .lang-panes .lang-pane { display: none; }
+  .lang-panes .lang-pane.active { display: block; }
+
+  /* ===========================
+     상단 기본 정보 그리드
+     - 5칸으로 정렬 (도시코드~경도 한 줄)
+     =========================== */
+  .master-city-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr)); /* ✅ 경도까지 한 줄 */
+    gap: 12px 16px;
+    align-items: flex-end;
+    margin-top: 16px;
+  }
+
+  /* 반응형에서 칸 수 줄이기 */
+  @media (max-width: 1200px) {
+    .master-city-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 960px) {
+    .master-city-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* ===========================
+     미리보기 + 이미지 URL
+     - 카드 폭 기준으로 와이드
+     - URL은 미리보기 아래로
+     =========================== */
+  .mc-preview-cell {
+    grid-column: 1 / -1;      /* 전체 폭 */
+    display: block;           /* 세로 스택 */
+    margin-top: 12px;
+  }
+
+  .mc-preview-box {
+    width: 100%;
+  }
+
+  .mc-preview-label {
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 4px;
+  }
+
+  /* ✅ 와이드 미리보기 */
+  #mcImagePreview {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;   /* 전체 이미지 보이게 */
+    background: #f9fafb;
+  }
+
+  /* ✅ 활성 체크는 오른쪽 하단 느낌으로 */
+  .mc-active-row {
+    margin-top: 6px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+  }
+  .mc-active-row input {
+    margin: 0;
+  }
+
+  /* ✅ URL 입력은 전체 폭, 미리보기 아래 */
+  .mc-preview-cell .field {
+    margin-top: 10px;
+    width: 100%;
+  }
+  .mc-preview-cell .field input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* ===========================
+     overview / 언어 영역
+     =========================== */
+  .lang-panes {
+    margin-top: 18px;
+  }
+
+  .lang-pane input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+  }
+
+  /* ✅ overview 일정 높이, 줄바꿈 & 스크롤 */
+  .lang-pane textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 180px;
+    max-height: 260px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 8px 10px;
+  }
+
+  /* ===========================
+     하단 버튼 영역 여유 주기
+     =========================== */
+  .master-city-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;             /* ✅ overview랑 간격 */
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb; /* 버튼이 카드에 딱 붙어 보이지 않게 */
+  }
+</style>
+
+
+</head>
+<body data-page-title="도시 마스터 관리">
+  <div class="app-shell">
+    <!-- 공통 헤더 (layout.js 에서 채움) -->
+    <header class="admin-header"></header>
+
+    <div class="admin-layout">
+      <!-- 좌측 메뉴: index.html / menu-admin.html 과 동일 구조 -->
+      <aside class="sidebar">
+        <nav class="menu-tree">
+          <div class="menu-group">
+            <div class="menu-group-title">도시 관리</div>
+            <ul>
+              <li><a href="./index.html" class="menu-link active">도시 관리</a></li>
+            </ul>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-group-title">캐시 · 배치</div>
+            <ul>
+              <li><a href="./index.html#section-tools" class="menu-link">캐시 / 배치 도구</a></li>
+            </ul>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-group-title">관리자 설정</div>
+            <ul>
+              <li data-requires-admin="true">
+                <a href="./menu-admin.html" class="menu-link">관리 메뉴 관리</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ✅ 우측 메인 (상세) -->
+      <main class="admin-main master-city-main">
+        <section class="card">
+          <h2>도시 마스터 상세 / 다국어 관리</h2>
+          <p class="card-desc">
+            index.html의 도시 목록에서 선택한 도시의 상세 및 다국어 정보를 관리합니다.
+          </p>
+
+          <!-- 상단 기본 정보 + 미리보기 -->
+          <div class="master-city-grid">
+            <div class="field">
+              <label for="mcCityCode">도시코드</label>
+              <input id="mcCityCode" placeholder="예: 31-15" />
+            </div>
+            <div class="field">
+              <label for="mcCountryCode">국가코드</label>
+              <input id="mcCountryCode" placeholder="예: KR" />
+            </div>
+            <div class="field">
+              <label for="mcAreaName">지역명</label>
+              <input id="mcAreaName" placeholder="예: 경기도" />
+            </div>
+            <div class="field">
+              <label for="mcLat">위도</label>
+              <input id="mcLat" placeholder="예: 37.321877" />
+            </div>
+            <div class="field">
+              <label for="mcLon">경도</label>
+              <input id="mcLon" placeholder="예: 126.830884" />
+            </div>
+
+            <!-- 👉 우측 미리보기 + URL + 활성 -->
+            <div class="mc-preview-cell">
+              <div class="mc-preview-box">
+                <div class="mc-preview-label">미리보기</div>
+                  <img
+                    id="mcImagePreview"
+                    src="./img/placeholder.png"
+                    alt="도시 대표 이미지 미리보기"
+                    onerror="this.onerror=null; this.src='./img/placeholder.png';"
+                  />
+                <div class="mc-active-row">
+                  <input type="checkbox" id="mcIsActive" />
+                  <label for="mcIsActive">활성</label>
+                </div>
+              </div>
+
+              <div class="field" style="margin-top:8px;">
+                <label for="mcImageUrl">대표 이미지 URL</label>
+                <input id="mcImageUrl" placeholder="https://..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- 언어 탭 -->
+          <div class="lang-tabs">
+            <button data-lang="ko" class="lang-tab active">한국어</button>
+            <button data-lang="en" class="lang-tab">English</button>
+            <button data-lang="ja" class="lang-tab">日本語</button>
+            <button data-lang="zh" class="lang-tab">中文</button>
+          </div>
+
+          <div class="lang-panes">
+            <div class="lang-pane active" data-lang="ko">
+              <input id="mcName_ko" placeholder="도시명 (ko)" />
+              <input id="mcHighlights_ko" placeholder="하이라이트 (ko)" />
+              <textarea id="mcOverview_ko" placeholder="overview HTML (ko)"></textarea>
+              <input type="hidden" id="mcId_ko" />
+            </div>
+            <div class="lang-pane" data-lang="en">
+              <input id="mcName_en" placeholder="City name (en)" />
+              <input id="mcHighlights_en" placeholder="Highlights (en)" />
+              <textarea id="mcOverview_en" placeholder="overview HTML (en)"></textarea>
+              <input type="hidden" id="mcId_en" />
+            </div>
+            <div class="lang-pane" data-lang="ja">
+              <input id="mcName_ja" placeholder="都市名 (ja)" />
+              <input id="mcHighlights_ja" placeholder="ハイライト (ja)" />
+              <textarea id="mcOverview_ja" placeholder="overview HTML (ja)"></textarea>
+              <input type="hidden" id="mcId_ja" />
+            </div>
+            <div class="lang-pane" data-lang="zh">
+              <input id="mcName_zh" placeholder="城市名 (zh)" />
+              <input id="mcHighlights_zh" placeholder="亮点 (zh)" />
+              <textarea id="mcOverview_zh" placeholder="overview HTML (zh)"></textarea>
+              <input type="hidden" id="mcId_zh" />
+            </div>
+          </div>
+
+          <!-- 하단 버튼 -->
+          <div class="master-city-actions">
+            <!-- ✅ 목록 버튼 추가 -->
+            <button id="btnMasterBack" type="button">목록</button>
+
+            <button id="btnMasterSave" type="button">도시 저장 (전체 언어)</button>
+            <button id="btnMasterReset" type="button">초기화</button>
+            <button id="btnMasterDelete" type="button">도시 전체 삭제</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- 공통 스크립트 -->
+  <script src="./js/main.js"></script>
+  <script src="./js/layout.js"></script>
+  <script src="./js/master-city.js"></script>
+</body>
+</html>

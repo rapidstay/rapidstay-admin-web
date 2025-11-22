@@ -1,8 +1,8 @@
 // ===============================
-// 🔐 RapidStay Admin Auth Utility
+// 🔐 RapidStay Admin Auth Utility (Firebase + EC2 대응)
 // ===============================
-const TOKEN_KEY = "rapidstay_admin_token";
-const CLOCK_SKEW_MS = 30 * 1000; // 시간 오차 보정
+const TOKEN_KEY = "jwt";              // ✅ main.js, utils.js와 동일 키로 통일
+const CLOCK_SKEW_MS = 30 * 1000;      // 시간 오차 보정
 
 export function saveToken(token) {
   localStorage.setItem(TOKEN_KEY, token);
@@ -32,18 +32,21 @@ function parseJwt(token) {
   }
 }
 
-export function isTokenValid() {
+function isTokenValid() {
   const token = getToken();
   if (!token) return false;
   const payload = parseJwt(token);
   if (!payload || !payload.exp) return false;
+  // exp는 초 단위, Date.now()는 밀리초
   return Date.now() + CLOCK_SKEW_MS < payload.exp * 1000;
 }
 
 // 로그인 페이지에서 토큰이 있으면 index로 보냄
 export function requireGuest() {
   if (isTokenValid()) {
-    location.replace("/index.html");
+    if (!location.pathname.includes("index")) {
+      location.href = "/index.html";
+    }
   }
 }
 
@@ -51,6 +54,8 @@ export function requireGuest() {
 export function requireAuth() {
   if (!isTokenValid()) {
     clearToken();
-    location.replace("/login.html");
+    if (!location.pathname.includes("login")) {
+      location.href = "/login.html";
+    }
   }
 }

@@ -3,64 +3,115 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RapidStay Admin Console</title>
+  <title>RapidStay Admin Console - 도시 관리</title>
   <link rel="stylesheet" href="./css/admin.css" />
 </head>
-<body>
-  <header>
-    <h1>🧭 RapidStay Admin Console</h1>
-    <p class="subtitle">도시 / 캐시 관리</p>
-  </header>
+<body data-page-title="도시 관리 / 캐시 도구">
+  <div class="app-shell">
+    <!-- ✅ 공통 헤더: layout.js에서 렌더링 -->
+    <header class="admin-header"></header>
 
-  <main>
-    <!-- 도시 관리 -->
-    <section class="card">
-      <h2>도시 관리</h2>
-      <div class="row">
-        <input id="search" placeholder="도시명 검색 (예: 서울)" />
-        <button id="btnSearch">검색</button>
-        <button id="btnAll">전체보기</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th><th>CityName</th><th>CityNameKr</th><th>Country</th>
-            <th>Lat</th><th>Lon</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="cityRows"></tbody>
-      </table>
-    </section>
+    <!-- 본문 레이아웃 -->
+    <div class="admin-layout">
+      <!-- 좌측 사이드바 (트리 메뉴) -->
+      <aside class="sidebar">
+        <nav class="menu-tree">
+          <div class="menu-group">
+            <div class="menu-group-title">도시 관리</div>
+            <ul>
+              <li>
+                <!-- ✅ 도시 관리 단일 메뉴 -->
+                <a href="./index.html" class="menu-link active">
+                  도시 관리
+                </a>
+              </li>
+            </ul>
+          </div>
 
-    <!-- 도시 상세 관리 -->
-    <div class="admin-section">
-      <h3>🏙️ 도시 생성 / 수정</h3>
-      <div class="admin-toolbox">
-        <input id="cityEn" placeholder="도시명(영문)" />
-        <input id="cityKr" placeholder="도시명(한글)" />
-        <input id="country" placeholder="국가" />
-        <input id="lat" placeholder="위도" />
-        <input id="lon" placeholder="경도" />
-      </div>
-      <div class="admin-btns">
-        <button id="btnAdd">등록</button>
-        <button id="btnUpdate">수정</button>
-        <button id="btnReset">폼 초기화</button>
-      </div>
+          <div class="menu-group">
+            <div class="menu-group-title">캐시 · 배치</div>
+            <ul>
+              <li>
+                <a href="#section-tools" class="menu-link">
+                  캐시 / 배치 도구
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-group-title">관리자 설정</div>
+            <ul>
+              <li>
+                <a href="./menu-admin.html" class="menu-link">
+                  관리 메뉴 관리
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- 우측 메인 콘텐츠 -->
+      <main class="admin-main">
+        <!-- 도시 리스트 섹션 -->
+        <section class="card">
+          <div class="card-header">
+            <h2>도시 관리</h2>
+            <div class="card-actions">
+              <input
+                id="search"
+                type="text"
+                placeholder="도시명 검색 (예: 서울)"
+              />
+              <button id="btnSearch">검색</button>
+              <button id="btnAll">전체보기</button>
+            </div>
+          </div>
+
+          <table class="city-table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">ID</th>
+                <th style="width: 100px;">Country</th>
+                <th>AreaName</th>
+                <th>CityName</th>
+                <th style="width: 120px;">Lat</th>
+                <th style="width: 120px;">Lon</th>
+                <th style="width: 120px;">Level</th>
+              </tr>
+            </thead>
+            <tbody id="cityRows">
+              <!-- main.js에서 동적으로 렌더링 -->
+            </tbody>
+          </table>
+
+          <div class="city-pagination">
+            <button id="btnPrev">이전</button>
+            <span id="pageInfo">1 / 1</span>
+            <button id="btnNext">다음</button>
+          </div>
+        </section>
+
+        <!-- 캐시 / 배치 도구 -->
+        <section id="section-tools" class="card">
+          <h2>운영 도구</h2>
+          <p class="card-desc">
+            Redis 캐시와 도시 랭킹 관련 배치를 여기서 실행할 수 있습니다.
+          </p>
+          <div class="admin-btns">
+            <button id="btnFlush">Redis 캐시 초기화</button>
+            <button id="btnRebuild">city:list 재빌드</button>
+            <button id="btnBatch">CityDataCollector 실행</button>
+          </div>
+          <pre id="result" class="result-log"></pre>
+        </section>
+      </main>
     </div>
+  </div>
 
-    <!-- 운영 도구 -->
-    <section class="card">
-      <h2>운영 도구</h2>
-      <div class="row">
-        <button id="btnFlush">Redis 캐시 초기화</button>
-        <button id="btnRebuild">city:list 재빌드</button>
-        <button id="btnBatch">CityDataCollector 실행</button>
-      </div>
-      <pre id="result"></pre>
-    </section>
-  </main>
-
+  <!-- 공통 / 페이지 스크립트 -->
   <script src="./js/main.js"></script>
+  <script src="./js/layout.js"></script>
 </body>
 </html>

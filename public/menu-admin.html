@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>관리 메뉴 관리 - RapidStay Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+
+<body data-page-title="관리 메뉴 관리">
+  <div class="app-shell">
+    <!-- ✅ 공통 헤더: layout.js에서 렌더링 -->
+    <header class="admin-header"></header>
+
+    <div class="admin-layout">
+      <!-- 좌측: 트리 네비게이션 -->
+      <aside class="sidebar">
+        <nav class="menu-tree">
+          <div class="menu-group">
+            <div class="menu-group-title">도시 관리</div>
+            <ul>
+              <!-- ✅ 도시 목록 + 마스터 도시 관리 통합 -->
+              <li><a href="./index.html" class="menu-link">도시 관리</a></li>
+            </ul>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-group-title">캐시 · 배치</div>
+            <ul>
+              <li><a href="./index.html#section-tools" class="menu-link">캐시 / 배치 도구</a></li>
+            </ul>
+          </div>
+
+          <div class="menu-group">
+            <div class="menu-group-title">관리자 설정</div>
+            <ul>
+              <!-- ✅ ADMIN 전용 메뉴 -->
+              <li data-requires-admin="true">
+                <a href="./menu-admin.html" class="menu-link active">관리 메뉴 관리</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- 우측: 관리 메뉴 관리 본문 -->
+      <main class="admin-main">
+        <section class="card">
+          <h2>관리 메뉴 관리</h2>
+          <p class="card-desc">
+            좌측 트리에서 폴더/페이지를 선택하고, 우측에서 이름·URL·권한을 수정합니다.
+            현재는 브라우저 localStorage에만 저장되며, 추후 백엔드 RBAC와 연동할 수 있습니다.
+          </p>
+
+          <div class="menu-admin-layout">
+            <!-- 트리 패널 -->
+            <div class="menu-admin-tree-panel">
+              <div class="menu-admin-tree-toolbar">
+                <button type="button" id="btnAddFolder">폴더 추가</button>
+                <button type="button" id="btnAddPage">페이지 추가</button>
+                <button type="button" id="btnDeleteMenu">삭제</button>
+              </div>
+              <ul id="menuTree" class="menu-admin-tree"></ul>
+            </div>
+
+            <!-- 상세 패널 -->
+            <div class="menu-admin-detail">
+              <h3>선택된 메뉴 상세</h3>
+              <div class="menu-admin-detail-form">
+                <div class="field">
+                  <label for="menuType">타입</label>
+                  <select id="menuType">
+                    <option value="folder">폴더</option>
+                    <option value="page">페이지</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="menuOrder">정렬 순서</label>
+                  <input id="menuOrder" type="number" min="0" step="1" />
+                </div>
+                <div class="field field-full">
+                  <label for="menuLabel">표시 이름</label>
+                  <input id="menuLabel" type="text" placeholder="예: 도시 관리" />
+                </div>
+                <div class="field field-full">
+                  <label for="menuPath">경로 (URL)</label>
+                  <input id="menuPath" type="text" placeholder="예: /index.html" />
+                </div>
+                <div class="field field-full">
+                  <label for="menuRole">권한 코드</label>
+                  <input id="menuRole" type="text" placeholder="예: ROLE_ADMIN, ROLE_CITY_MANAGER" />
+                </div>
+              </div>
+
+              <div class="admin-btns" style="margin-top: 12px;">
+                <button type="button" id="btnSaveMenu">저장</button>
+                <button type="button" id="btnResetMenu">변경 취소</button>
+              </div>
+
+              <p class="menu-admin-help">
+                ※ 권한 코드는 나중에 백엔드 RBAC(역할 기반 권한)와 매핑해서 사용할 수 있습니다.
+                현재는 화면 구성과 구조 설계용입니다.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- 공통 스크립트 -->
+  <script src="./js/main.js"></script>
+  <script src="./js/layout.js"></script>
+
+  <!-- 메뉴 관리 전용 스크립트 (localStorage 기반) -->
+  <script>
+    const STORAGE_KEY = "rapidstay.admin.menus";
+
+    /** ✅ 기본 트리 구조 (도시 관리 = 한 메뉴) */
+    const DEFAULT_MENUS = [
+      {
+        id: "root",
+        label: "관리 메뉴",
+        type: "folder",
+        order: 0,
+        path: "",
+        role: "",
+        children: [
+          {
+            id: "city",
+            label: "도시 관리",
+            type: "folder",
+            order: 10,
+            path: "",
+            role: "",
+            children: [
+              {
+                id: "city-main",
+                label: "도시 관리",
+                type: "page",
+                order: 11,
+                path: "/index.html",
+                role: "ROLE_CITY_MANAGER",
+                children: []
+              }
+            ]
+          },
+          {
+            id: "ops",
+            label: "캐시 · 배치",
+            type: "folder",
+            order: 20,
+            path: "",
+            role: "ROLE_ADMIN",
+            children: [
+              {
+                id: "cache-tools",
+                label: "캐시 / 배치 도구",
+                type: "page",
+                order: 21,
+                path: "/index.html#section-tools",
+                role: "ROLE_ADMIN",
+                children: []
+              }
+            ]
+          },
+          {
+            id: "system",
+            label: "관리자 설정",
+            type: "folder",
+            order: 30,
+            path: "",
+            role: "ROLE_ADMIN",
+            children: [
+              {
+                id: "menu-admin",
+                label: "관리 메뉴 관리",
+                type: "page",
+                order: 31,
+                path: "/menu-admin.html",
+                role: "ROLE_ADMIN",
+                children: []
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    let menuTreeData = loadMenus();
+    let selectedId = "menu-admin"; // 기본 선택: 자기 자신
+    let originalSnapshot = JSON.stringify(menuTreeData);
+
+    const $ = (id) => document.getElementById(id);
+
+    function loadMenus() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(DEFAULT_MENUS);
+        return JSON.parse(raw);
+      } catch (e) {
+        console.error("메뉴 로드 실패, 기본 메뉴 사용:", e);
+        return structuredClone(DEFAULT_MENUS);
+      }
+    }
+
+    function saveMenus() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(menuTreeData));
+      originalSnapshot = JSON.stringify(menuTreeData);
+    }
+
+    function findNodeById(id, nodes = menuTreeData) {
+      for (const node of nodes) {
+        if (node.id === id) return node;
+        if (node.children && node.children.length) {
+          const found = findNodeById(id, node.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function findParentOf(id, nodes = menuTreeData, parent = null) {
+      for (const node of nodes) {
+        if (node.id === id) return parent;
+        if (node.children && node.children.length) {
+          const found = findParentOf(id, node.children, node);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function renderTree() {
+      const rootEl = $("menuTree");
+      rootEl.innerHTML = "";
+      const roots = [...menuTreeData].sort((a, b) => a.order - b.order);
+      roots.forEach((node) => {
+        rootEl.appendChild(renderNode(node));
+      });
+    }
+
+    function renderNode(node) {
+      const li = document.createElement("li");
+
+      const row = document.createElement("div");
+      row.className = "menu-admin-node";
+      row.dataset.id = node.id;
+      if (node.id === selectedId) {
+        row.classList.add("selected");
+      }
+
+      const typeBadge = document.createElement("span");
+      typeBadge.textContent = node.type === "folder" ? "📁" : "📄";
+      typeBadge.style.fontSize = "13px";
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "menu-admin-node-label";
+      labelSpan.textContent = node.label || "(이름 없음)";
+
+      row.appendChild(typeBadge);
+      row.appendChild(labelSpan);
+      row.addEventListener("click", () => {
+        selectedId = node.id;
+        fillForm();
+        renderTree();
+      });
+
+      li.appendChild(row);
+
+      if (node.children && node.children.length) {
+        const ul = document.createElement("ul");
+        ul.className = "menu-admin-children";
+        const sorted = [...node.children].sort((a, b) => a.order - b.order);
+        sorted.forEach((child) => {
+          ul.appendChild(renderNode(child));
+        });
+        li.appendChild(ul);
+      }
+
+      return li;
+    }
+
+    function fillForm() {
+      const node = findNodeById(selectedId);
+      if (!node) return;
+
+      $("menuType").value = node.type || "folder";
+      $("menuOrder").value = node.order ?? 0;
+      $("menuLabel").value = node.label ?? "";
+      $("menuPath").value = node.path ?? "";
+      $("menuRole").value = node.role ?? "";
+    }
+
+    function applyFormToNode() {
+      const node = findNodeById(selectedId);
+      if (!node) return;
+
+      node.type = $("menuType").value || "folder";
+      node.order = Number($("menuOrder").value || 0);
+      node.label = $("menuLabel").value || "";
+      node.path = $("menuPath").value || "";
+      node.role = $("menuRole").value || "";
+    }
+
+    function addMenu(type) {
+      const idBase = type === "folder" ? "folder" : "page";
+      const newId = `${idBase}-${Date.now()}`;
+      const parent = findNodeById(selectedId) || menuTreeData[0];
+
+      if (!parent.children) parent.children = [];
+
+      parent.children.push({
+        id: newId,
+        label: type === "folder" ? "새 폴더" : "새 페이지",
+        type,
+        order: (parent.children.length + 1) * 10,
+        path: "",
+        role: "",
+        children: []
+      });
+
+      selectedId = newId;
+      renderTree();
+      fillForm();
+    }
+
+    function deleteSelected() {
+      if (!selectedId) return;
+      if (selectedId === "root") {
+        alert("루트 노드는 삭제할 수 없습니다.");
+        return;
+      }
+      if (!confirm("선택한 메뉴를 삭제하시겠습니까?")) return;
+
+      const parent = findParentOf(selectedId);
+      if (!parent || !parent.children) return;
+
+      parent.children = parent.children.filter((c) => c.id !== selectedId);
+      selectedId = parent.id;
+      renderTree();
+      fillForm();
+    }
+
+    // 이벤트 바인딩
+    window.addEventListener("DOMContentLoaded", () => {
+      renderTree();
+      fillForm();
+
+      $("btnAddFolder").addEventListener("click", () => {
+        addMenu("folder");
+      });
+
+      $("btnAddPage").addEventListener("click", () => {
+        addMenu("page");
+      });
+
+      $("btnDeleteMenu").addEventListener("click", () => {
+        deleteSelected();
+        saveMenus();
+      });
+
+      $("btnSaveMenu").addEventListener("click", () => {
+        applyFormToNode();
+        saveMenus();
+        renderTree();
+        alert("메뉴 구성이 저장되었습니다. (localStorage 기준)");
+      });
+
+      $("btnResetMenu").addEventListener("click", () => {
+        menuTreeData = JSON.parse(originalSnapshot);
+        renderTree();
+        fillForm();
+      });
+    });
+  </script>
+</body>
+</html>
