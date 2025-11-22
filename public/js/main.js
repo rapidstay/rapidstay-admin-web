@@ -8,11 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ✅ API 기본 URL
-const AUTH_BASE =
-  location.hostname.includes("localhost") || location.hostname.includes("127.0.0.1")
-    ? "http://localhost:8082" // 로컬 백엔드
-    : "http://54.79.1.230:8082"; // 운영 서버
+const isLocal =
+  location.hostname.includes("localhost") || location.hostname.includes("127.0.0.1");
 
+const AUTH_BASE = isLocal
+  ? "http://localhost:8082"          // 로컬 개발용
+  : "https://54.79.1.230:8082";      // 운영 서버는 HTTPS로
 const API_BASE = AUTH_BASE;
 
 // 간단 DOM 헬퍼
